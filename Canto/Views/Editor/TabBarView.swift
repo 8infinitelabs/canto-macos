@@ -50,6 +50,7 @@ struct TabButton: View {
                         .foregroundStyle(CantoColors.textSecondary)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Close \(tab.name)")
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)

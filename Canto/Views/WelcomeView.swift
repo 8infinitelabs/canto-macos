@@ -52,6 +52,7 @@ struct WelcomeView: View {
                 .buttonStyle(.borderedProminent)
                 .tint(CantoColors.accent)
                 .controlSize(.large)
+                .accessibilityHint("Choose a project folder to open")
             }
             .frame(maxWidth: 400)
 
