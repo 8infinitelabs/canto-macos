@@ -8,9 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		04D8A8BC9DE01E395AB3165A /* CantoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C42409D7DB9D5B94567E9D /* CantoTests.swift */; };
+		1589670B5E38347A43860CC7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AD052DD7EDFF2F09A3D8F61F /* Assets.xcassets */; };
+		283D47B8A33366F565D32E70 /* CantoAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58951D7FE09A6501275022BE /* CantoAnimations.swift */; };
 		836022555801767C3681139E /* CantoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A6AE1480BF27184AF07F68 /* CantoApp.swift */; };
 		87DF11A1165C797AEEE85193 /* MainWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FFBB3511AB1AE63EB80735 /* MainWindowView.swift */; };
+		C34C9642F54133221C8589C2 /* CantoColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5D663263DCAA80423EC3B1 /* CantoColors.swift */; };
 		C4098314AC079CC2421C1B35 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6BF80F3DD0DD5C91FC593F4 /* AppState.swift */; };
+		F87B1B28A81C2CF23E351729 /* CantoTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6F6F93B1EE71E70CF62FC74 /* CantoTypography.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,10 +29,14 @@
 
 /* Begin PBXFileReference section */
 		06FFBB3511AB1AE63EB80735 /* MainWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindowView.swift; sourceTree = "<group>"; };
+		0D5D663263DCAA80423EC3B1 /* CantoColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CantoColors.swift; sourceTree = "<group>"; };
 		32A6AE1480BF27184AF07F68 /* CantoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CantoApp.swift; sourceTree = "<group>"; };
 		36E809988085EE727A146E71 /* Canto.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Canto.entitlements; sourceTree = "<group>"; };
 		4051A0699C7A7C83A5DEA783 /* CantoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CantoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5089DDD4BF31B9AE8A30B132 /* Canto.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Canto.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		58951D7FE09A6501275022BE /* CantoAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CantoAnimations.swift; sourceTree = "<group>"; };
+		A6F6F93B1EE71E70CF62FC74 /* CantoTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CantoTypography.swift; sourceTree = "<group>"; };
+		AD052DD7EDFF2F09A3D8F61F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C6BF80F3DD0DD5C91FC593F4 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		D7C42409D7DB9D5B94567E9D /* CantoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CantoTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -76,12 +84,24 @@
 			path = CantoTests;
 			sourceTree = "<group>";
 		};
+		7DA78B8AAD45AB6FCDBBC371 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				58951D7FE09A6501275022BE /* CantoAnimations.swift */,
+				0D5D663263DCAA80423EC3B1 /* CantoColors.swift */,
+				A6F6F93B1EE71E70CF62FC74 /* CantoTypography.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
 		E5CA436B6FFDCD8074BCFB89 /* Canto */ = {
 			isa = PBXGroup;
 			children = (
+				AD052DD7EDFF2F09A3D8F61F /* Assets.xcassets */,
 				36E809988085EE727A146E71 /* Canto.entitlements */,
 				32A6AE1480BF27184AF07F68 /* CantoApp.swift */,
 				5B007D05320BCEF73AC86645 /* Models */,
+				7DA78B8AAD45AB6FCDBBC371 /* Theme */,
 				2A206BE175F12AE7E56E98A7 /* Views */,
 			);
 			path = Canto;
@@ -95,6 +115,7 @@
 			buildConfigurationList = 3E087C7CE24BEF50B4C60B9D /* Build configuration list for PBXNativeTarget "Canto" */;
 			buildPhases = (
 				CF014EB874496F7AAFE52391 /* Sources */,
+				C6AC43198B4B0CC10E26D62E /* Resources */,
 			);
 			buildRules = (
 			);
@@ -156,13 +177,27 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		C6AC43198B4B0CC10E26D62E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1589670B5E38347A43860CC7 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		CF014EB874496F7AAFE52391 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				C4098314AC079CC2421C1B35 /* AppState.swift in Sources */,
+				283D47B8A33366F565D32E70 /* CantoAnimations.swift in Sources */,
 				836022555801767C3681139E /* CantoApp.swift in Sources */,
+				C34C9642F54133221C8589C2 /* CantoColors.swift in Sources */,
+				F87B1B28A81C2CF23E351729 /* CantoTypography.swift in Sources */,
 				87DF11A1165C797AEEE85193 /* MainWindowView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
