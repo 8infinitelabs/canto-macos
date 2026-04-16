@@ -7,10 +7,11 @@ struct MainWindowView: View {
         Group {
             if appState.hasOpenFolder {
                 NavigationSplitView {
-                    Text("Sidebar placeholder")
+                    SidebarView()
                 } detail: {
-                    Text("Editor placeholder")
+                    EditorContainerView()
                 }
+                .navigationSplitViewStyle(.balanced)
             } else {
                 WelcomeView()
             }
