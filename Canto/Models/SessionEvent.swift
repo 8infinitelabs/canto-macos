@@ -23,16 +23,18 @@ struct SessionEvent: Codable, Identifiable {
         case planCreated = "plan_created"
     }
 
-    init(type: EventType, path: String? = nil, summary: String? = nil) {
+    init(type: EventType, path: String? = nil, summary: String? = nil,
+         commitHash: String? = nil, commitMessage: String? = nil,
+         filesChanged: Int? = nil, insertions: Int? = nil, deletions: Int? = nil) {
         self.id = UUID()
         self.timestamp = Date()
         self.type = type
         self.path = path
         self.summary = summary
-        self.commitHash = nil
-        self.commitMessage = nil
-        self.filesChanged = nil
-        self.insertions = nil
-        self.deletions = nil
+        self.commitHash = commitHash
+        self.commitMessage = commitMessage
+        self.filesChanged = filesChanged
+        self.insertions = insertions
+        self.deletions = deletions
     }
 }
