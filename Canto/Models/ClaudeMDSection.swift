@@ -1,7 +1,7 @@
 import Foundation
 
 struct ClaudeMDSection: Identifiable {
-    let id: String // heading text or "root"
+    let id: String // UUID to avoid collision
     let heading: String?
     let headingLevel: Int // 0 for root (no heading)
     var rules: [RuleItem] // bullet points

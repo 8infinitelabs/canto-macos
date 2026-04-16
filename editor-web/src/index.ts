@@ -8,6 +8,7 @@ import { listener, listenerCtx } from '@milkdown/plugin-listener'
 import { setupBridge, sendToSwift } from './bridge'
 import './styles/editor.css'
 import './styles/dark.css'
+import './styles/light.css'
 
 let editor: Editor | null = null
 let isCodeView = false

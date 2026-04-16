@@ -50,6 +50,8 @@ class RecentFoldersManager {
             bookmarkDataIsStale: &isStale
         ) else { return nil }
 
+        guard url.startAccessingSecurityScopedResource() else { return nil }
+
         if isStale {
             addFolder(url: url)
         }

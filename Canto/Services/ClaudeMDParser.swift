@@ -15,7 +15,7 @@ enum ClaudeMDParser {
             let prose = currentProse.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
             if currentHeading != nil || !prose.isEmpty || !currentRules.isEmpty {
                 sections.append(ClaudeMDSection(
-                    id: currentHeading ?? "root",
+                    id: UUID().uuidString,
                     heading: currentHeading,
                     headingLevel: currentLevel,
                     rules: currentRules,

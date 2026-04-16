@@ -64,6 +64,38 @@ struct ClaudeSidebarSection: View {
                 }
             }
 
+            // Plans
+            DisclosureGroup {
+                ForEach(planFiles, id: \.id) { node in
+                    Button {
+                        appState.openFile(node)
+                    } label: {
+                        Text(node.name)
+                            .font(CantoTypography.sidebar)
+                            .lineLimit(1)
+                    }
+                    .buttonStyle(.plain)
+                }
+            } label: {
+                Label {
+                    HStack {
+                        Text("Plans")
+                            .font(CantoTypography.sidebar)
+                        Spacer()
+                        Text("\(planFiles.count)")
+                            .font(CantoTypography.uiSmall)
+                            .foregroundStyle(CantoColors.textSecondary)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(CantoColors.surface)
+                            .cornerRadius(4)
+                    }
+                } icon: {
+                    Image(systemName: "list.bullet.clipboard")
+                        .foregroundStyle(CantoColors.accent)
+                }
+            }
+
             Button {
                 // Open config panel
             } label: {
@@ -72,5 +104,22 @@ struct ClaudeSidebarSection: View {
             }
             .buttonStyle(.plain)
         }
+    }
+
+    private var planFiles: [FileNode] {
+        func findPlans(in nodes: [FileNode]) -> [FileNode] {
+            var result: [FileNode] = []
+            for node in nodes {
+                if node.isDirectory, let children = node.children {
+                    if node.name == "plans" {
+                        result += children.filter { $0.isMarkdown }
+                    } else {
+                        result += findPlans(in: children)
+                    }
+                }
+            }
+            return result
+        }
+        return findPlans(in: appState.fileTree)
     }
 }

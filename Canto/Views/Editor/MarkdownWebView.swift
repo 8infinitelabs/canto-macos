@@ -5,7 +5,7 @@ struct MarkdownWebView: NSViewRepresentable {
     let content: String
     let theme: String
     let onContentChange: (String) -> Void
-    let onWordCount: (Int, Int) -> Void // words, readingTime
+    let onWordCount: (Int, Int) -> Void
 
     func makeCoordinator() -> Coordinator {
         Coordinator(onContentChange: onContentChange, onWordCount: onWordCount)
@@ -29,14 +29,24 @@ struct MarkdownWebView: NSViewRepresentable {
     }
 
     func updateNSView(_ webView: WKWebView, context: Context) {
-        context.coordinator.sendToJS(webView: webView, type: "loadFile", payload: content)
-        context.coordinator.sendToJS(webView: webView, type: "setTheme", payload: theme)
+        // Only send loadFile if content changed from Swift side (not from JS callback)
+        if content != context.coordinator.lastSentContent {
+            context.coordinator.lastSentContent = content
+            context.coordinator.sendToJS(webView: webView, type: "loadFile", payload: content)
+        }
+        if theme != context.coordinator.lastSentTheme {
+            context.coordinator.lastSentTheme = theme
+            context.coordinator.sendToJS(webView: webView, type: "setTheme", payload: theme)
+        }
     }
 
     class Coordinator: NSObject, WKScriptMessageHandler {
         var webView: WKWebView?
         var isReady = false
         var pendingMessages: [(String, String)] = []
+        var lastSentContent: String = ""
+        var lastSentTheme: String = ""
+        private var isLocalChange = false
         let onContentChange: (String) -> Void
         let onWordCount: (Int, Int) -> Void
 
@@ -60,6 +70,8 @@ struct MarkdownWebView: NSViewRepresentable {
                 pendingMessages.removeAll()
             case "contentChanged":
                 if let content = body["data"] as? String {
+                    // Mark as local change so updateNSView doesn't re-send
+                    lastSentContent = content
                     DispatchQueue.main.async { self.onContentChange(content) }
                 }
             case "wordCount":

@@ -33,7 +33,7 @@ struct MemoryCardView: View {
 
                     Spacer()
 
-                    if memory.isStale {
+                    if memory.isStale() {
                         Image(systemName: "clock.badge.exclamationmark")
                             .font(.system(size: 12))
                             .foregroundStyle(CantoColors.memoryProject)

@@ -13,10 +13,10 @@ struct MemoryFile: Identifiable, Hashable {
         case user, feedback, project, reference, unknown
     }
 
-    var isStale: Bool {
+    func isStale(thresholdDays: Int = 14) -> Bool {
         guard type == .project else { return false }
         let daysOld = Calendar.current.dateComponents([.day], from: modifiedDate, to: Date()).day ?? 0
-        return daysOld > 14
+        return daysOld > thresholdDays
     }
 
     static func == (lhs: MemoryFile, rhs: MemoryFile) -> Bool { lhs.id == rhs.id }

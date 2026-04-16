@@ -8,7 +8,7 @@ final class MemoryFileTests: XCTestCase {
             name: "old", description: "", type: .project,
             content: "", modifiedDate: Date().addingTimeInterval(-30 * 86400)
         )
-        XCTAssertTrue(old.isStale)
+        XCTAssertTrue(old.isStale())
     }
 
     func testFreshProjectMemoryNotStale() {
@@ -17,7 +17,7 @@ final class MemoryFileTests: XCTestCase {
             name: "fresh", description: "", type: .project,
             content: "", modifiedDate: Date()
         )
-        XCTAssertFalse(fresh.isStale)
+        XCTAssertFalse(fresh.isStale())
     }
 
     func testUserMemoryNeverStale() {
@@ -26,6 +26,6 @@ final class MemoryFileTests: XCTestCase {
             name: "old", description: "", type: .user,
             content: "", modifiedDate: Date().addingTimeInterval(-90 * 86400)
         )
-        XCTAssertFalse(old.isStale)
+        XCTAssertFalse(old.isStale())
     }
 }
