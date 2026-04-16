@@ -17,6 +17,8 @@ class AppState {
     let recentFolders = RecentFoldersManager()
     let fileWatcher = FileWatcherService()
     var sessionManager: SessionManager?
+    private var gitPollTimer: Timer?
+    private var lastKnownCommitHash: String?
 
     // Claude-specific state
     var memories: [MemoryFile] = []
@@ -61,9 +63,18 @@ class AppState {
         )
 
         recentFolders.addFolder(url: url)
+
+        // Start git polling if git repo
+        if GitService.isGitRepo(at: url) {
+            let commits = GitService.recentCommits(at: url, limit: 1)
+            lastKnownCommitHash = commits.first?.hash
+            startGitPolling(url: url)
+        }
     }
 
     func closeFolderIfNeeded() {
+        gitPollTimer?.invalidate()
+        gitPollTimer = nil
         if let url = openFolderURL {
             fileWatcher.stopWatching()
             FolderAccessService.stopAccessing(url: url)
@@ -148,6 +159,29 @@ class AppState {
             else { return nil }
             return try? MemoryParser.parse(content: content, url: url, modifiedDate: modDate)
         }
+    }
+
+    // MARK: - Git polling
+
+    private func startGitPolling(url: URL) {
+        gitPollTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+            self?.checkForNewCommits(at: url)
+        }
+    }
+
+    private func checkForNewCommits(at url: URL) {
+        let commits = GitService.recentCommits(at: url, limit: 5)
+        for commit in commits {
+            if commit.hash == lastKnownCommitHash { break }
+            sessionManager?.recordCommit(
+                hash: commit.hash,
+                message: commit.message,
+                filesChanged: commit.filesChanged,
+                insertions: commit.insertions,
+                deletions: commit.deletions
+            )
+        }
+        lastKnownCommitHash = commits.first?.hash
     }
 
     // MARK: - File watcher handling
