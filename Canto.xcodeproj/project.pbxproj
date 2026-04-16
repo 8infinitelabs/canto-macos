@@ -59,6 +59,7 @@
 		A1C07A5E5DB92FD5EB38B5C9 /* SessionEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9DD4F3D5A5485B88919AFE /* SessionEvent.swift */; };
 		A86AFD86B2810FB7CE0D149A /* sample-session.json in Resources */ = {isa = PBXBuildFile; fileRef = 2A4EC96B1F158023B38634FD /* sample-session.json */; };
 		A8F34A0AC9CEAB4E006B1B42 /* SessionRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54BF1B638432CB23568517B /* SessionRecordTests.swift */; };
+		B968B25073D7353AA16C4BC1 /* AppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA66D35DBD6948651C56F09B /* AppIconView.swift */; };
 		BC5210FF6ECFD2BDB9F3C6C8 /* sample-memory-user.md in Resources */ = {isa = PBXBuildFile; fileRef = 91FB187BC7A0ECE4BE8E50BB /* sample-memory-user.md */; };
 		C213A78682C5CA8E27EE4AE0 /* ClaudeMDParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF276C2496804D3F80CEAB5 /* ClaudeMDParserTests.swift */; };
 		C34C9642F54133221C8589C2 /* CantoColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5D663263DCAA80423EC3B1 /* CantoColors.swift */; };
@@ -158,6 +159,7 @@
 		E48D65A856396DC110E044AA /* ClaudeSidebarSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeSidebarSection.swift; sourceTree = "<group>"; };
 		E558626DB6C86BD7CDE78FA7 /* MarkdownWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownWebView.swift; sourceTree = "<group>"; };
 		E786423CB332A3C50F7B8022 /* MCPServerRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPServerRow.swift; sourceTree = "<group>"; };
+		EA66D35DBD6948651C56F09B /* AppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconView.swift; sourceTree = "<group>"; };
 		EC395AD08FAB61ABFAF62A5C /* SessionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManagerTests.swift; sourceTree = "<group>"; };
 		F2CC5E48C19835B9EB3F2B5D /* MemoryFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryFile.swift; sourceTree = "<group>"; };
 		F42E10BA774ADCF42EE38AF7 /* FileTreeBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTreeBuilderTests.swift; sourceTree = "<group>"; };
@@ -178,6 +180,7 @@
 		0BDB01201FB641D6A3FDE28B /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				EA66D35DBD6948651C56F09B /* AppIconView.swift */,
 				66E872CE5E913272E00B62D3 /* BreadcrumbView.swift */,
 				81229CE5AC47736290BF0657 /* CommandPaletteView.swift */,
 				2D9626F6443C48B5496E849D /* ConflictBannerView.swift */,
@@ -479,6 +482,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B968B25073D7353AA16C4BC1 /* AppIconView.swift in Sources */,
 				C4098314AC079CC2421C1B35 /* AppState.swift in Sources */,
 				C35CFE212205234AF964D3CF /* BreadcrumbView.swift in Sources */,
 				283D47B8A33366F565D32E70 /* CantoAnimations.swift in Sources */,

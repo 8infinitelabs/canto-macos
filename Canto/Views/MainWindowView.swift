@@ -59,12 +59,5 @@ struct MainWindowView: View {
                 appState.openFolder(url)
             }
         }
-        // Keyboard shortcuts
-        .keyboardShortcut("k", modifiers: .command) // Cmd+K doesn't work on ZStack, use menu commands instead
-        .onAppear { setupMenuCommands() }
-    }
-
-    private func setupMenuCommands() {
-        // Menu commands are handled via the App's .commands modifier
     }
 }

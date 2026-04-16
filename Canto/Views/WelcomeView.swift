@@ -8,14 +8,8 @@ struct WelcomeView: View {
             Spacer()
 
             VStack(spacing: 12) {
-                Circle()
-                    .fill(CantoColors.accent)
-                    .frame(width: 48, height: 48)
-                    .overlay(
-                        Circle()
-                            .fill(CantoColors.accent.opacity(0.3))
-                            .frame(width: 56, height: 56)
-                    )
+                AppIconView()
+                    .frame(width: 80, height: 80)
 
                 Text("Canto")
                     .font(CantoTypography.displayLarge)
