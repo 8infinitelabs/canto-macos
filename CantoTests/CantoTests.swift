@@ -4,7 +4,7 @@ import XCTest
 final class CantoTests: XCTestCase {
     func testAppStateInitialValues() {
         let state = AppState()
-        XCTAssertNil(state.openFolderPath)
+        XCTAssertNil(state.openFolderURL)
         XCTAssertFalse(state.isClaudeProject)
         XCTAssertFalse(state.hasOpenFolder)
     }
