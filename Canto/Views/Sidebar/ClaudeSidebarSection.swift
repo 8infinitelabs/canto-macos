@@ -93,23 +93,28 @@ struct ClaudeSidebarSection: View {
                     .buttonStyle(.plain)
                 }
             } label: {
-                Label {
-                    HStack {
-                        Text("Plans")
-                            .font(CantoTypography.sidebar)
-                        Spacer()
-                        Text("\(planFiles.count)")
-                            .font(CantoTypography.uiSmall)
-                            .foregroundStyle(CantoColors.textSecondary)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(CantoColors.surface)
-                            .cornerRadius(4)
+                Button {
+                    appState.activeView = .plansBrowser
+                } label: {
+                    Label {
+                        HStack {
+                            Text("Plans")
+                                .font(CantoTypography.sidebar)
+                            Spacer()
+                            Text("\(planFiles.count)")
+                                .font(CantoTypography.uiSmall)
+                                .foregroundStyle(CantoColors.textSecondary)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(CantoColors.surface)
+                                .cornerRadius(4)
+                        }
+                    } icon: {
+                        Image(systemName: "list.bullet.clipboard")
+                            .foregroundStyle(CantoColors.accent)
                     }
-                } icon: {
-                    Image(systemName: "list.bullet.clipboard")
-                        .foregroundStyle(CantoColors.accent)
                 }
+                .buttonStyle(.plain)
             }
 
             Button {

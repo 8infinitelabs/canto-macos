@@ -11,6 +11,8 @@ struct EditorContainerView: View {
             switch appState.activeView {
             case .memoryBrowser:
                 MemoryBrowserView()
+            case .plansBrowser:
+                PlansBrowserView()
             case .configPanel:
                 ConfigPanelView()
             case .sessionTimeline:

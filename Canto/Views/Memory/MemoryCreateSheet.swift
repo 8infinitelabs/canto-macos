@@ -68,7 +68,7 @@ struct MemoryCreateSheet: View {
 
     private func createMemory() {
         guard let folderURL = appState.openFolderURL else { return }
-        let memoryDir = folderURL.appendingPathComponent(".claude/projects/memory")
+        let memoryDir = folderURL.appendingPathComponent(".claude/memory")
         try? FileManager.default.createDirectory(at: memoryDir, withIntermediateDirectories: true)
 
         let filename = name.replacingOccurrences(of: " ", with: "_").lowercased() + ".md"
@@ -84,7 +84,13 @@ struct MemoryCreateSheet: View {
         \(content)
         """
 
-        try? fileContent.write(to: fileURL, atomically: true, encoding: .utf8)
-        dismiss()
+        do {
+            try fileContent.write(to: fileURL, atomically: true, encoding: .utf8)
+            // Reload memories from disk
+            appState.reloadMemories()
+            dismiss()
+        } catch {
+            print("[Canto] Failed to create memory: \(error)")
+        }
     }
 }

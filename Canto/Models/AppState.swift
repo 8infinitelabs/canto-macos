@@ -3,6 +3,7 @@ import SwiftUI
 enum ActiveView: Equatable {
     case editor
     case memoryBrowser
+    case plansBrowser
     case sessionTimeline
     case configPanel
     case dashboard
@@ -167,6 +168,16 @@ class AppState {
         mcpServers = config.servers
         permissions = config.permissions
         hooks = config.hooks
+    }
+
+    func reloadMemories() {
+        guard let folderURL = openFolderURL else { return }
+        loadMemories(from: folderURL.appendingPathComponent(".claude/memory"))
+    }
+
+    func reloadPlans() {
+        guard let folderURL = openFolderURL else { return }
+        fileTree = FileTreeBuilder.build(from: folderURL, mode: .markdownOnly)
     }
 
     private func loadMemories(from directory: URL) {
