@@ -6,6 +6,9 @@
 
 Canto is a visual companion for [Claude Code](https://claude.com/claude-code) users. Claude writes and consumes a lot of markdown — project instructions, memories, plans, outputs. Canto gives you a WYSIWYG editor and a dedicated sidebar to manage all of that in one place.
 
+**Website:** [canto.basicstech.org](https://canto.basicstech.org)
+**Built by:** [BasicsTech](https://basicstech.org) · [hello@basicstech.org](mailto:hello@basicstech.org)
+
 ---
 
 ## Products
@@ -19,27 +22,15 @@ The **VS Code extension is the primary product**. The macOS app is kept as a ref
 
 ---
 
-## Install
-
-### VS Code extension
+## Install (VS Code extension)
 
 From the Marketplace:
 
 ```sh
-code --install-extension infinitelabs.canto
+code --install-extension basicstech.canto
 ```
 
 Or search **Canto** in the Extensions panel inside VS Code / Cursor / Windsurf.
-
-### macOS app (v1, frozen)
-
-```sh
-git clone https://github.com/8infinitelabs/canto.git
-cd canto
-xcodegen generate
-xcodebuild -project Canto.xcodeproj -scheme Canto build
-cp -R ~/Library/Developer/Xcode/DerivedData/Canto-*/Build/Products/Debug/Canto.app /Applications/
-```
 
 ---
 
@@ -83,7 +74,7 @@ npm install
 npm run watch
 # Press F5 in VS Code to open Extension Development Host
 
-# macOS app
+# macOS app (frozen, for reference)
 cd Canto
 xcodegen generate
 open Canto.xcodeproj
@@ -91,23 +82,20 @@ open Canto.xcodeproj
 
 ### Publishing the extension
 
-Tag with `vscode-v*.*.*` and push — GitHub Actions builds and publishes to the Marketplace (requires `VSCE_PAT` secret in repo settings).
-
-```sh
-cd canto-vscode
-npm version patch       # bumps version in package.json
-git commit -am "release: vscode 0.1.1"
-git tag vscode-v0.1.1
-git push && git push --tags
-```
+See [`PUBLISHING.md`](./PUBLISHING.md) for the full step-by-step.
 
 ---
 
+## Support
+
+- **Issues:** [github.com/basicstech/canto/issues](https://github.com/basicstech/canto/issues)
+- **Email:** [canto@basicstech.org](mailto:canto@basicstech.org)
+
 ## License
 
-MIT © [Infinite Labs OÜ](https://github.com/8infinitelabs)
+MIT © [BasicsTech](https://basicstech.org)
 
 ## Credits
 
 - WYSIWYG editor: [Vditor](https://github.com/Vanessa219/vditor)
-- Icon font & theme inspiration: Linear, VS Code
+- Design inspiration: Linear, VS Code

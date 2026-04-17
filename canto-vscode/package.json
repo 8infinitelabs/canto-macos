@@ -1,23 +1,29 @@
 {
   "name": "canto",
-  "displayName": "Canto",
-  "description": "Claude's markdown companion — edit CLAUDE.md, memories, and plans visually, right in your IDE.",
+  "displayName": "Canto — Claude's markdown companion",
+  "description": "Edit CLAUDE.md, memories, and plans visually, right inside your IDE. Built for Claude Code users.",
   "version": "0.1.0",
-  "publisher": "infinitelabs",
+  "publisher": "basicstech",
   "author": {
-    "name": "Diego Torres",
-    "email": "diego@pdata.org"
+    "name": "BasicsTech",
+    "email": "hello@basicstech.org",
+    "url": "https://basicstech.org"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/8infinitelabs/canto.git"
+    "url": "https://github.com/basicstech/canto.git"
   },
-  "homepage": "https://github.com/8infinitelabs/canto",
+  "homepage": "https://canto.basicstech.org",
   "bugs": {
-    "url": "https://github.com/8infinitelabs/canto/issues"
+    "url": "https://github.com/basicstech/canto/issues",
+    "email": "canto@basicstech.org"
   },
   "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#FFFFFF",
+    "theme": "light"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },

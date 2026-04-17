@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Canto — Claude's markdown companion</title>
+  <meta name="description" content="Edit CLAUDE.md, memories, and plans visually, right inside your IDE. A VS Code extension for Claude Code users." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Canto — Claude's markdown companion" />
+  <meta property="og:description" content="Edit CLAUDE.md, memories, and plans visually, right inside your IDE." />
+  <meta property="og:url" content="https://canto.basicstech.org" />
+  <meta property="og:image" content="https://canto.basicstech.org/assets/icon.png" />
+  <meta property="og:type" content="website" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Canto — Claude's markdown companion" />
+  <meta name="twitter:description" content="Edit CLAUDE.md, memories, and plans visually, right inside your IDE." />
+  <meta name="twitter:image" content="https://canto.basicstech.org/assets/icon.png" />
+
+  <link rel="icon" type="image/png" href="assets/icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-soft: #fafafa;
+      --surface: #f5f5f7;
+      --text: #18181b;
+      --text-secondary: #71717a;
+      --border: #e4e4e7;
+      --accent: #D67059;        /* Claude coral */
+      --accent-deep: #BF5B45;
+      --accent-violet: #8B5CF6;
+      --max-width: 1120px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0A0A0F;
+        --bg-soft: #111116;
+        --surface: #18181D;
+        --text: #F4F4F5;
+        --text-secondary: #A1A1AA;
+        --border: #27272A;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      font-feature-settings: "ss01", "cv11";
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    header {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: color-mix(in srgb, var(--bg) 90%, transparent);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .logo img { width: 28px; height: 28px; border-radius: 7px; }
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* Hero */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 28px;
+    }
+    .hero-badge span { color: var(--accent); font-weight: 600; }
+
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 72px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--accent-violet), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .hero p.subtitle {
+      font-size: 20px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      transition: transform 0.1s, opacity 0.15s;
+    }
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+    }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--border); }
+
+    .code-pill {
+      display: inline-block;
+      margin-top: 28px;
+      padding: 8px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .code-pill::before { content: '$ '; color: var(--accent); }
+
+    /* Sections */
+    section.section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .section-eyebrow {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+    .section h2 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .section p.lead {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 640px;
+      margin-bottom: 48px;
+    }
+
+    /* Features grid */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .feature {
+      padding: 28px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .feature:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+    }
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-violet), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 20px;
+    }
+    .feature h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .feature p {
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+
+    /* Compat list */
+    .compat-list {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .compat-pill {
+      padding: 8px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* Footer */
+    footer {
+      padding: 60px 0 40px;
+      border-top: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+    @media (max-width: 700px) {
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .footer-col h4 {
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .footer-col a:hover { color: var(--text); }
+    .footer-bottom {
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-brand img {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container header-row">
+      <a href="/" class="logo">
+        <img src="assets/icon.png" alt="Canto" />
+        Canto
+      </a>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#install">Install</a>
+        <a href="https://github.com/basicstech/canto">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero container">
+    <div class="hero-badge">🎉 v0.1 — <span>Now on VS Code Marketplace</span></div>
+    <h1>
+      Claude's<br />
+      <span class="gradient">markdown companion.</span>
+    </h1>
+    <p class="subtitle">
+      Edit <code>CLAUDE.md</code>, memories, and plans visually, right inside your IDE. Built for <a href="https://claude.com/claude-code" style="color: inherit; text-decoration: underline;">Claude Code</a> users.
+    </p>
+
+    <div class="cta-row">
+      <a href="https://marketplace.visualstudio.com/items?itemName=basicstech.canto" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM7 5h10v14H7V5z"/></svg>
+        Install from Marketplace
+      </a>
+      <a href="https://github.com/basicstech/canto" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57v-2c-3.34.72-4.04-1.61-4.04-1.61A3.18 3.18 0 0 0 3.6 17.7c-1.09-.75.08-.73.08-.73a2.52 2.52 0 0 1 1.84 1.24 2.56 2.56 0 0 0 3.5 1 2.56 2.56 0 0 1 .76-1.6c-2.67-.3-5.47-1.33-5.47-5.93a4.63 4.63 0 0 1 1.23-3.22 4.3 4.3 0 0 1 .12-3.18s1-.32 3.3 1.23a11.4 11.4 0 0 1 6 0C17 4.74 18 5.06 18 5.06a4.3 4.3 0 0 1 .12 3.18 4.63 4.63 0 0 1 1.23 3.22c0 4.6-2.8 5.62-5.48 5.92a2.87 2.87 0 0 1 .82 2.22v3.3c0 .31.2.7.84.57A12 12 0 0 0 12 .3"/></svg>
+        View on GitHub
+      </a>
+    </div>
+
+    <div class="code-pill">code --install-extension basicstech.canto</div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-eyebrow">Features</div>
+      <h2>Built for how you work with Claude.</h2>
+      <p class="lead">Claude writes and reads a lot of markdown. Canto gives you the dedicated tools to manage that context without leaving your IDE.</p>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">✏️</div>
+          <h3>WYSIWYG editor</h3>
+          <p>Edit markdown in the rendered view. Bold, italic, headings, tables — real typography, not raw syntax.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🧠</div>
+          <h3>Memory browser</h3>
+          <p>All your <code>.claude/memory/*.md</code> in one place, with types, stale indicators, and one-click create.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📋</div>
+          <h3>Plans view</h3>
+          <p>See plans from <code>docs/superpowers/plans/</code> or <code>.claude/plans/</code>. Scaffold new ones instantly.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">⚙️</div>
+          <h3>Config panel</h3>
+          <p>Quick read-only view of your MCP servers, permissions, and hooks from Claude Code settings.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📄</div>
+          <h3>CLAUDE.md dashboard</h3>
+          <p>Open CLAUDE.md from the sidebar. Sections and rules rendered as cards, not walls of text.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🎨</div>
+          <h3>Theme-aware</h3>
+          <p>Matches your VS Code dark/light theme automatically. Looks native everywhere.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="install">
+    <div class="container">
+      <div class="section-eyebrow">Install</div>
+      <h2>One command. Works everywhere.</h2>
+      <p class="lead">Canto runs anywhere the VS Code Extension API runs.</p>
+
+      <div class="compat-list">
+        <div class="compat-pill">VS Code 1.85+</div>
+        <div class="compat-pill">Cursor</div>
+        <div class="compat-pill">Windsurf</div>
+        <div class="compat-pill">VSCodium</div>
+      </div>
+
+      <div style="margin-top: 32px;">
+        <div class="code-pill" style="margin-top: 0;">code --install-extension basicstech.canto</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-brand">
+            <img src="assets/icon.png" alt="Canto" />
+            <strong style="color: var(--text);">Canto</strong>
+          </div>
+          <p style="margin-top: 12px; max-width: 300px;">
+            Claude's markdown companion. Built by <a href="https://basicstech.org" style="color: var(--text);">BasicsTech</a>.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#install">Install</a></li>
+            <li><a href="https://marketplace.visualstudio.com/items?itemName=basicstech.canto">Marketplace</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://github.com/basicstech/canto">GitHub</a></li>
+            <li><a href="https://github.com/basicstech/canto/issues">Issues</a></li>
+            <li><a href="https://github.com/basicstech/canto/discussions">Discussions</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="mailto:canto@basicstech.org">canto@basicstech.org</a></li>
+            <li><a href="https://basicstech.org">basicstech.org</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>© 2026 BasicsTech. MIT License.</div>
+        <div>Made for <a href="https://claude.com/claude-code" style="color: var(--text);">Claude Code</a> users.</div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
