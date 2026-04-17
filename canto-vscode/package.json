@@ -2,7 +2,7 @@
   "name": "canto",
   "displayName": "Canto — Claude's markdown companion",
   "description": "Edit CLAUDE.md, memories, and plans visually, right inside your IDE. Built for Claude Code users.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "basicstech",
   "author": {
     "name": "BasicsTech",
@@ -12,11 +12,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/basicstech/canto.git"
+    "url": "https://github.com/Basics-Tech/canto.git"
   },
   "homepage": "https://canto.basicstech.org",
   "bugs": {
-    "url": "https://github.com/basicstech/canto/issues",
+    "url": "https://github.com/Basics-Tech/canto/issues",
     "email": "canto@basicstech.org"
   },
   "icon": "media/icon.png",

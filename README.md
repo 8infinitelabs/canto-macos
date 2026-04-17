@@ -88,7 +88,7 @@ See [`PUBLISHING.md`](./PUBLISHING.md) for the full step-by-step.
 
 ## Support
 
-- **Issues:** [github.com/basicstech/canto/issues](https://github.com/basicstech/canto/issues)
+- **Issues:** [github.com/Basics-Tech/canto/issues](https://github.com/Basics-Tech/canto/issues)
 - **Email:** [canto@basicstech.org](mailto:canto@basicstech.org)
 
 ## License

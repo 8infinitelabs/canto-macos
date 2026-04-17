@@ -1,5 +1,12 @@
 # Canto Changelog
 
+## 0.1.1 — 2026-04-17
+
+- Rebrand to BasicsTech publisher (`basicstech`)
+- GitHub repo now at [Basics-Tech/canto](https://github.com/Basics-Tech/canto)
+- Landing site: [canto.basicstech.org](https://canto.basicstech.org)
+- Badges + clearer links at the top of the README
+
 ## 0.1.0 — 2026-04-17
 
 Initial release.

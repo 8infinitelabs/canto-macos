@@ -2,10 +2,11 @@
 
 > Edit `CLAUDE.md`, memories, plans, and all your markdown — visually, right inside your IDE.
 
-Canto is a VS Code extension that gives [Claude Code](https://claude.com/claude-code) users a dedicated, visual editor for the markdown files that power their Claude projects: `CLAUDE.md`, `.claude/memory/*.md`, plans, and docs.
+[![Website](https://img.shields.io/badge/website-canto.basicstech.org-D67059?style=for-the-badge)](https://canto.basicstech.org)
+[![GitHub](https://img.shields.io/badge/github-Basics--Tech%2Fcanto-24292F?style=for-the-badge&logo=github)](https://github.com/Basics-Tech/canto)
+[![Report an issue](https://img.shields.io/badge/issues-welcome-8B5CF6?style=for-the-badge)](https://github.com/Basics-Tech/canto/issues)
 
-**Website:** [canto.basicstech.org](https://canto.basicstech.org)
-**Source:** [github.com/basicstech/canto](https://github.com/basicstech/canto)
+Canto is a VS Code extension that gives [Claude Code](https://claude.com/claude-code) users a dedicated, visual editor for the markdown files that power their Claude projects: `CLAUDE.md`, `.claude/memory/*.md`, plans, and docs.
 
 ## Features
 
@@ -66,7 +67,7 @@ A canto is a section of a long poem. Fits the Anthropic family (Opus, Sonnet, Ha
 
 ## Support
 
-- **Issues / feature requests:** [github.com/basicstech/canto/issues](https://github.com/basicstech/canto/issues)
+- **Issues / feature requests:** [github.com/Basics-Tech/canto/issues](https://github.com/Basics-Tech/canto/issues)
 - **Email:** [canto@basicstech.org](mailto:canto@basicstech.org)
 
 ## License

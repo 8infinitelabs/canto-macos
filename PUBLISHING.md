@@ -50,13 +50,13 @@ npx @vscode/vsce login basicstech
 
 ```sh
 cd /Users/diego/dev/canto
-git remote add origin git@github.com:basicstech/canto.git
+git remote add origin git@github.com:Basics-Tech/canto.git
 git push -u origin main
 ```
 
 ### 6. Add the PAT to GitHub Secrets
 
-1. Go to https://github.com/basicstech/canto/settings/secrets/actions
+1. Go to https://github.com/Basics-Tech/canto/settings/secrets/actions
 2. Click **New repository secret**
 3. **Name:** `VSCE_PAT`
 4. **Value:** paste the PAT from step 2
@@ -86,7 +86,7 @@ The workflow at `.github/workflows/publish-extension.yml`:
 3. Publishes to Marketplace with `VSCE_PAT`
 4. Creates a GitHub Release with the `.vsix` attached
 
-Check progress at https://github.com/basicstech/canto/actions.
+Check progress at https://github.com/Basics-Tech/canto/actions.
 
 ### Option B: Manual from your machine
 
@@ -106,7 +106,7 @@ The landing is at `/docs/index.html` with a `CNAME` file pointing to `canto.basi
 ### One-time setup
 
 1. **Enable GitHub Pages:**
-   - Go to https://github.com/basicstech/canto/settings/pages
+   - Go to https://github.com/Basics-Tech/canto/settings/pages
    - Source: **Deploy from a branch**
    - Branch: **main** / folder: **/docs**
    - Click **Save**
