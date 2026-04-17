@@ -5,21 +5,32 @@ struct ClaudeSidebarSection: View {
 
     var body: some View {
         Section("CLAUDE") {
-            if let claudeNode = appState.fileTree.first(where: { $0.isClaudeMD }) {
-                Button {
-                    appState.openFile(claudeNode)
-                } label: {
-                    Label {
-                        Text("CLAUDE.md")
-                            .font(CantoTypography.sidebarBold)
-                    } icon: {
-                        Image(systemName: "doc.text.fill")
-                            .foregroundStyle(CantoColors.accent)
-                    }
+            // CLAUDE.md — may not be in fileTree (filtered), open from disk
+            Button {
+                if let folderURL = appState.openFolderURL {
+                    let claudeMDURL = folderURL.appendingPathComponent("CLAUDE.md")
+                    let node = FileNode(
+                        id: "CLAUDE.md",
+                        name: "CLAUDE.md",
+                        url: claudeMDURL,
+                        isDirectory: false,
+                        children: nil,
+                        fileExtension: "md"
+                    )
+                    appState.openFile(node)
                 }
-                .buttonStyle(.plain)
+            } label: {
+                Label {
+                    Text("CLAUDE.md")
+                        .font(CantoTypography.sidebarBold)
+                } icon: {
+                    Image(systemName: "doc.text.fill")
+                        .foregroundStyle(CantoColors.accent)
+                }
             }
+            .buttonStyle(.plain)
 
+            // Memory — click label opens browser, expand shows list
             DisclosureGroup {
                 ForEach(appState.memories) { memory in
                     Button {
@@ -45,23 +56,28 @@ struct ClaudeSidebarSection: View {
                     .buttonStyle(.plain)
                 }
             } label: {
-                Label {
-                    HStack {
-                        Text("Memory")
-                            .font(CantoTypography.sidebar)
-                        Spacer()
-                        Text("\(appState.memories.count)")
-                            .font(CantoTypography.uiSmall)
-                            .foregroundStyle(CantoColors.textSecondary)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(CantoColors.surface)
-                            .cornerRadius(4)
+                Button {
+                    appState.activeView = .memoryBrowser
+                } label: {
+                    Label {
+                        HStack {
+                            Text("Memory")
+                                .font(CantoTypography.sidebar)
+                            Spacer()
+                            Text("\(appState.memories.count)")
+                                .font(CantoTypography.uiSmall)
+                                .foregroundStyle(CantoColors.textSecondary)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(CantoColors.surface)
+                                .cornerRadius(4)
+                        }
+                    } icon: {
+                        Image(systemName: "brain")
+                            .foregroundStyle(CantoColors.accent)
                     }
-                } icon: {
-                    Image(systemName: "brain")
-                        .foregroundStyle(CantoColors.accent)
                 }
+                .buttonStyle(.plain)
             }
 
             // Plans
@@ -97,7 +113,7 @@ struct ClaudeSidebarSection: View {
             }
 
             Button {
-                // Open config panel
+                appState.activeView = .configPanel
             } label: {
                 Label("Config", systemImage: "gearshape")
                     .font(CantoTypography.sidebar)

@@ -2,6 +2,16 @@ import SwiftUI
 
 struct WelcomeView: View {
     @Environment(AppState.self) private var appState
+    @Environment(\.openWindow) private var openWindow
+
+    private func openProject(url: URL) {
+        // If this window is empty (welcome), load here; otherwise open new window
+        if appState.hasOpenFolder {
+            openWindow(id: "project", value: url)
+        } else {
+            appState.openFolder(url)
+        }
+    }
 
     var body: some View {
         VStack(spacing: 32) {
@@ -15,9 +25,16 @@ struct WelcomeView: View {
                     .font(CantoTypography.displayLarge)
                     .foregroundStyle(CantoColors.textPrimary)
 
-                Text("See what you build with Claude.")
+                Text("Claude's markdown companion.")
                     .font(CantoTypography.body)
                     .foregroundStyle(CantoColors.textSecondary)
+
+                Text("One window per project. Edit CLAUDE.md, memories, plans, and outputs visually.")
+                    .font(CantoTypography.bodySmall)
+                    .foregroundStyle(CantoColors.textSecondary.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 420)
+                    .padding(.top, 4)
             }
 
             VStack(spacing: 16) {
@@ -32,15 +49,18 @@ struct WelcomeView: View {
                             Text("Drop a project folder here")
                                 .font(CantoTypography.body)
                                 .foregroundStyle(CantoColors.textSecondary)
+                            Text("Works best with a .claude/ directory")
+                                .font(CantoTypography.uiSmall)
+                                .foregroundStyle(CantoColors.textSecondary.opacity(0.6))
                         }
                     )
                     .onDrop(of: [.fileURL], isTargeted: nil) { providers in
                         handleDrop(providers)
                     }
 
-                Button("Open Folder") {
+                Button("Open Project") {
                     if let url = FolderAccessService.openFolderPanel() {
-                        appState.openFolder(url)
+                        openProject(url: url)
                     }
                 }
                 .buttonStyle(.borderedProminent)
@@ -59,7 +79,7 @@ struct WelcomeView: View {
                     ForEach(appState.recentFolders.folders.prefix(5)) { folder in
                         Button {
                             if let url = appState.recentFolders.resolveBookmark(folder) {
-                                appState.openFolder(url)
+                                openProject(url: url)
                             }
                         } label: {
                             HStack {
@@ -107,7 +127,7 @@ struct WelcomeView: View {
                   url.hasDirectoryPath
             else { return }
             DispatchQueue.main.async {
-                appState.openFolder(url)
+                openProject(url: url)
             }
         }
         return true

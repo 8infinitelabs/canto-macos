@@ -1,11 +1,22 @@
 import SwiftUI
 
+enum ActiveView: Equatable {
+    case editor
+    case memoryBrowser
+    case sessionTimeline
+    case configPanel
+    case dashboard
+}
+
 @Observable
 class AppState {
     // Folder state
     var openFolderURL: URL?
     var fileTree: [FileNode] = []
     var isClaudeProject: Bool = false
+
+    // View routing
+    var activeView: ActiveView = .editor
 
     // Tabs
     var tabs: [TabItem] = []
@@ -37,18 +48,22 @@ class AppState {
 
     func openFolder(_ url: URL) {
         closeFolderIfNeeded()
+        print("[Canto] openFolder: \(url.path)")
 
-        guard FolderAccessService.startAccessing(url: url) else { return }
+        _ = FolderAccessService.startAccessing(url: url)
         openFolderURL = url
 
-        fileTree = FileTreeBuilder.build(from: url)
+        fileTree = FileTreeBuilder.build(from: url, mode: .markdownOnly)
+        print("[Canto] fileTree: \(fileTree.count) items")
 
         isClaudeProject = FileManager.default.fileExists(
             atPath: url.appendingPathComponent(".claude").path
         )
+        print("[Canto] isClaudeProject: \(isClaudeProject)")
 
         if isClaudeProject {
             loadClaudeData(projectURL: url)
+            print("[Canto] claudeMD sections: \(claudeMDSections.count), memories: \(memories.count)")
         }
 
         fileWatcher.onChange = { [weak self] path, flags in
@@ -92,8 +107,11 @@ class AppState {
     // MARK: - Tab management
 
     func openFile(_ node: FileNode) {
+        print("[Canto] openFile: \(node.name) at \(node.url.path)")
+        activeView = node.isClaudeMD ? .dashboard : .editor
         if let existing = tabs.first(where: { $0.id == node.id }) {
             activeTabID = existing.id
+            print("[Canto] tab already open, switching")
             return
         }
 
@@ -104,10 +122,15 @@ class AppState {
             }
         }
 
-        guard let content = try? MarkdownFileService.read(url: node.url) else { return }
+        guard let content = try? MarkdownFileService.read(url: node.url) else {
+            print("[Canto] ERROR: failed to read file \(node.url.path)")
+            return
+        }
+        print("[Canto] file read OK, \(content.count) chars")
         let tab = TabItem(url: node.url, content: content)
         tabs.append(tab)
         activeTabID = tab.id
+        print("[Canto] tab created, activeTabID=\(tab.id)")
     }
 
     func closeTab(_ id: String) {
@@ -189,7 +212,7 @@ class AppState {
     private func handleFileChange(path: String, flags: FSEventStreamEventFlags) {
         guard let folderURL = openFolderURL else { return }
 
-        fileTree = FileTreeBuilder.build(from: folderURL)
+        fileTree = FileTreeBuilder.build(from: folderURL, mode: .markdownOnly)
 
         let relativePath = path.replacingOccurrences(of: folderURL.path + "/", with: "")
         let url = URL(fileURLWithPath: path)

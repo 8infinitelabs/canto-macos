@@ -1,7 +1,41 @@
 import Foundation
 
 enum FileTreeBuilder {
-    static func build(from rootURL: URL, gitignorePatterns: [String] = []) -> [FileNode] {
+    enum Mode {
+        case all
+        case markdownOnly
+    }
+
+    static func build(from rootURL: URL, mode: Mode = .all, gitignorePatterns: [String] = []) -> [FileNode] {
+        let tree = buildAll(from: rootURL, gitignorePatterns: gitignorePatterns)
+        switch mode {
+        case .all: return tree
+        case .markdownOnly: return pruneToMarkdown(tree)
+        }
+    }
+
+    /// Keep .md files, CLAUDE.md, and directories that contain .md descendants.
+    /// Drop everything else.
+    static func pruneToMarkdown(_ nodes: [FileNode]) -> [FileNode] {
+        var result: [FileNode] = []
+        for node in nodes {
+            if node.isDirectory {
+                if let children = node.children {
+                    let pruned = pruneToMarkdown(children)
+                    if !pruned.isEmpty {
+                        var keep = node
+                        keep.children = pruned
+                        result.append(keep)
+                    }
+                }
+            } else if node.isMarkdown {
+                result.append(node)
+            }
+        }
+        return result
+    }
+
+    private static func buildAll(from rootURL: URL, gitignorePatterns: [String] = []) -> [FileNode] {
         let fm = FileManager.default
         let standardRoot = rootURL.standardizedFileURL
         let rootPath = standardRoot.path

@@ -4,10 +4,25 @@ struct FileTreeSection: View {
     @Environment(AppState.self) private var appState
 
     var body: some View {
-        Section("FILES") {
-            ForEach(filteredNodes, id: \.id) { node in
-                FileNodeRow(node: node)
+        Section {
+            if filteredNodes.isEmpty {
+                Text("No markdown files in this project")
+                    .font(CantoTypography.uiSmall)
+                    .foregroundStyle(CantoColors.textSecondary)
+                    .italic()
+                    .padding(.vertical, 4)
+            } else {
+                ForEach(filteredNodes, id: \.id) { node in
+                    FileNodeRow(node: node)
+                }
+                Text("Only markdown is editable in Canto.")
+                    .font(CantoTypography.uiSmall)
+                    .foregroundStyle(CantoColors.textSecondary.opacity(0.6))
+                    .italic()
+                    .padding(.top, 8)
             }
+        } header: {
+            Text("DOCUMENTS")
         }
     }
 
@@ -24,7 +39,7 @@ struct FileNodeRow: View {
 
     var body: some View {
         if node.isDirectory {
-            DisclosureGroup(isExpanded: .constant(node.hasMarkdownChildren)) {
+            DisclosureGroup {
                 if let children = node.children {
                     ForEach(children, id: \.id) { child in
                         FileNodeRow(node: child)
@@ -34,10 +49,10 @@ struct FileNodeRow: View {
                 Label {
                     Text(node.name)
                         .font(CantoTypography.sidebar)
-                        .foregroundStyle(node.hasMarkdownChildren ? CantoColors.textPrimary : CantoColors.textSecondary)
+                        .foregroundStyle(CantoColors.textPrimary)
                 } icon: {
                     Image(systemName: "folder")
-                        .foregroundStyle(node.hasMarkdownChildren ? CantoColors.accent : CantoColors.textSecondary)
+                        .foregroundStyle(CantoColors.accent)
                 }
             }
         } else {
@@ -47,21 +62,13 @@ struct FileNodeRow: View {
                 Label {
                     Text(node.name)
                         .font(CantoTypography.sidebar)
-                        .foregroundStyle(node.isMarkdown ? CantoColors.textPrimary : CantoColors.textSecondary)
+                        .foregroundStyle(CantoColors.textPrimary)
                 } icon: {
-                    Image(systemName: iconForNode(node))
-                        .foregroundStyle(node.isMarkdown ? CantoColors.accent : CantoColors.textSecondary)
+                    Image(systemName: "doc.richtext")
+                        .foregroundStyle(CantoColors.accent)
                 }
             }
             .buttonStyle(.plain)
         }
-    }
-
-    private func iconForNode(_ node: FileNode) -> String {
-        if node.isMarkdown { return "doc.richtext" }
-        if node.isImage { return "photo" }
-        if node.isCode { return "chevron.left.forwardslash.chevron.right" }
-        if node.isConfig { return "gearshape" }
-        return "doc"
     }
 }

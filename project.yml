@@ -22,8 +22,6 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.developer-tools"
         INFOPLIST_KEY_CFBundleDisplayName: Canto
-    entitlements:
-      path: Canto/Canto.entitlements
 
   CantoTests:
     type: bundle.unit-test

@@ -16,6 +16,7 @@
 		1B6D5A72304385A7A5BE2762 /* ConflictBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D9626F6443C48B5496E849D /* ConflictBannerView.swift */; };
 		1C96BF8E83EAB74D54737171 /* GitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6DD5DC012176BD4389F4A30 /* GitService.swift */; };
 		2441DC036C7D120721BC0D61 /* MemoryBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8574B329C46D92BA9427F2 /* MemoryBrowserView.swift */; };
+		263627D789C7076BC67586E8 /* NativeMarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD338557B74BCA08F6320E5B /* NativeMarkdownView.swift */; };
 		283D47B8A33366F565D32E70 /* CantoAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58951D7FE09A6501275022BE /* CantoAnimations.swift */; };
 		284CC55931BD9720F40E411E /* SessionTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE111377287833DE8F5A01B /* SessionTimelineView.swift */; };
 		2B2C5C67164EA6B80C173C4F /* RecentFoldersManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8C7A9CC3574E4DF5870B8B /* RecentFoldersManager.swift */; };
@@ -67,6 +68,7 @@
 		C4098314AC079CC2421C1B35 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6BF80F3DD0DD5C91FC593F4 /* AppState.swift */; };
 		C7B34C9F55A881E73E830DC5 /* DashboardSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28143520A7D620ED072C2904 /* DashboardSectionView.swift */; };
 		D08442AE29FFA0A4F117FB7D /* MemoryFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CC5E48C19835B9EB3F2B5D /* MemoryFile.swift */; };
+		D3A62219366F5BD8556D4AE2 /* ClaudeActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1AA5C399C3F3599D5FE9BAD /* ClaudeActivityIndicator.swift */; };
 		E1311EC342DBB1700F9EBF2B /* ClaudeMDDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0202EC6583DF247C8AA983 /* ClaudeMDDashboardView.swift */; };
 		E222CB2CC88F9EAE49ABE364 /* MemoryParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E1EDE50FF87617B441D238 /* MemoryParser.swift */; };
 		E34A305681FCD7443DCC6680 /* FileTreeBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42E10BA774ADCF42EE38AF7 /* FileTreeBuilderTests.swift */; };
@@ -140,12 +142,14 @@
 		A938B68BFF382073657A1F94 /* MemoryCreateSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryCreateSheet.swift; sourceTree = "<group>"; };
 		AD052DD7EDFF2F09A3D8F61F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		ADEC65CD832C929AAA10C82E /* TimelineEventRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEventRow.swift; sourceTree = "<group>"; };
+		B1AA5C399C3F3599D5FE9BAD /* ClaudeActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeActivityIndicator.swift; sourceTree = "<group>"; };
 		B42611CD247D2C86B67FAB8D /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		B54BF1B638432CB23568517B /* SessionRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionRecordTests.swift; sourceTree = "<group>"; };
 		B57D341706DFA63B9AEF0B7D /* MarkdownFileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFileService.swift; sourceTree = "<group>"; };
 		BA3EEA1BAD26416E039851B9 /* ConfigReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigReaderTests.swift; sourceTree = "<group>"; };
 		BB2AB3D9FB98279C67E99288 /* FileTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTreeView.swift; sourceTree = "<group>"; };
 		C6BF80F3DD0DD5C91FC593F4 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		CD338557B74BCA08F6320E5B /* NativeMarkdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeMarkdownView.swift; sourceTree = "<group>"; };
 		CF722FA7B02F5524DDFFC9A8 /* ClaudeMDParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeMDParser.swift; sourceTree = "<group>"; };
 		D1228925EA9B20903649A5C7 /* sample-memory-feedback.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "sample-memory-feedback.md"; sourceTree = "<group>"; };
 		D41E6BE71A4AC3FF6CCFCED0 /* SessionSidebarSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSidebarSection.swift; sourceTree = "<group>"; };
@@ -276,6 +280,7 @@
 		715D874F12782FB21BA1D6F2 /* Sidebar */ = {
 			isa = PBXGroup;
 			children = (
+				B1AA5C399C3F3599D5FE9BAD /* ClaudeActivityIndicator.swift */,
 				E48D65A856396DC110E044AA /* ClaudeSidebarSection.swift */,
 				BB2AB3D9FB98279C67E99288 /* FileTreeView.swift */,
 				D41E6BE71A4AC3FF6CCFCED0 /* SessionSidebarSection.swift */,
@@ -379,6 +384,7 @@
 				3B23EA85AA281A9040D9C04D /* EditorContainerView.swift */,
 				96CC69E445BFD959BC079237 /* ImagePreviewView.swift */,
 				E558626DB6C86BD7CDE78FA7 /* MarkdownWebView.swift */,
+				CD338557B74BCA08F6320E5B /* NativeMarkdownView.swift */,
 				22CACDBB0A71F66854EFC30A /* TabBarView.swift */,
 			);
 			path = Editor;
@@ -489,6 +495,7 @@
 				836022555801767C3681139E /* CantoApp.swift in Sources */,
 				C34C9642F54133221C8589C2 /* CantoColors.swift in Sources */,
 				F87B1B28A81C2CF23E351729 /* CantoTypography.swift in Sources */,
+				D3A62219366F5BD8556D4AE2 /* ClaudeActivityIndicator.swift in Sources */,
 				E1311EC342DBB1700F9EBF2B /* ClaudeMDDashboardView.swift in Sources */,
 				5B8E3B8247898BA7EECCA1C8 /* ClaudeMDParser.swift in Sources */,
 				7CCB160B6717ACC826497B12 /* ClaudeMDSection.swift in Sources */,
@@ -518,6 +525,7 @@
 				F9CCB672BCF156917ED26721 /* MemoryCreateSheet.swift in Sources */,
 				D08442AE29FFA0A4F117FB7D /* MemoryFile.swift in Sources */,
 				E222CB2CC88F9EAE49ABE364 /* MemoryParser.swift in Sources */,
+				263627D789C7076BC67586E8 /* NativeMarkdownView.swift in Sources */,
 				4CC0B4F405F13682C7906D86 /* QuickSetupView.swift in Sources */,
 				52DC31CD5065DEDB1A8BCB73 /* RecentFolder.swift in Sources */,
 				2B2C5C67164EA6B80C173C4F /* RecentFoldersManager.swift in Sources */,

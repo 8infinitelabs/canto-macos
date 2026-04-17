@@ -4,18 +4,27 @@ struct SidebarView: View {
     @Environment(AppState.self) private var appState
 
     var body: some View {
-        List {
+        VStack(spacing: 0) {
+            // Session indicator at the top
             if appState.isClaudeProject {
-                ClaudeSidebarSection()
+                HStack {
+                    ClaudeActivityIndicator()
+                    Spacer()
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                Divider()
             }
 
-            FileTreeSection()
+            List {
+                if appState.isClaudeProject {
+                    ClaudeSidebarSection()
+                }
 
-            if appState.isSessionActive {
-                SessionSidebarSection()
+                FileTreeSection()
             }
+            .listStyle(.sidebar)
         }
-        .listStyle(.sidebar)
-        .frame(minWidth: 200)
+        .frame(minWidth: 220)
     }
 }

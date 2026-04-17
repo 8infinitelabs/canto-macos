@@ -15,15 +15,30 @@ let sizes: [(Int, String)] = [
     (16, "icon_16x16"),
 ]
 
-func drawIcon(size: Int) -> NSImage {
+func drawIcon(size: Int) -> Data? {
     let s = CGFloat(size)
-    let image = NSImage(size: NSSize(width: s, height: s))
-    image.lockFocus()
 
-    guard let ctx = NSGraphicsContext.current?.cgContext else {
-        image.unlockFocus()
-        return image
+    // Create bitmap context directly at the target pixel size
+    guard let bitmap = NSBitmapImageRep(
+        bitmapDataPlanes: nil,
+        pixelsWide: size,
+        pixelsHigh: size,
+        bitsPerSample: 8,
+        samplesPerPixel: 4,
+        hasAlpha: true,
+        isPlanar: false,
+        colorSpaceName: .deviceRGB,
+        bytesPerRow: 0,
+        bitsPerPixel: 0
+    ) else { return nil }
+
+    NSGraphicsContext.saveGraphicsState()
+    guard let gc = NSGraphicsContext(bitmapImageRep: bitmap) else {
+        NSGraphicsContext.restoreGraphicsState()
+        return nil
     }
+    NSGraphicsContext.current = gc
+    let ctx = gc.cgContext
 
     let colorSpace = CGColorSpaceCreateDeviceRGB()
 
@@ -83,11 +98,10 @@ func drawIcon(size: Int) -> NSImage {
     ctx.fillPath()
     ctx.restoreGState()
 
-    // Inner gradient on the C: white top → semi-transparent white bottom (relief effect)
+    // Inner gradient on the C for relief
     ctx.saveGState()
     ctx.addPath(textPath)
     ctx.clip()
-
     let innerColors = [
         CGColor(red: 1, green: 1, blue: 1, alpha: 0.95),
         CGColor(red: 1, green: 1, blue: 1, alpha: 0.55),
@@ -100,20 +114,20 @@ func drawIcon(size: Int) -> NSImage {
     }
     ctx.restoreGState()
 
-    image.unlockFocus()
-    return image
+    NSGraphicsContext.restoreGraphicsState()
+
+    return bitmap.representation(using: .png, properties: [:])
 }
 
 let outputDir = "/Users/diego/dev/canto/Canto/Assets.xcassets/AppIcon.appiconset"
 
 for (size, name) in sizes {
-    let image = drawIcon(size: size)
+    guard let data = drawIcon(size: size) else {
+        print("FAIL: \(name)")
+        continue
+    }
     let filename = "\(outputDir)/\(name).png"
-    guard let tiff = image.tiffRepresentation,
-          let bitmap = NSBitmapImageRep(data: tiff),
-          let png = bitmap.representation(using: .png, properties: [:])
-    else { continue }
-    try! png.write(to: URL(fileURLWithPath: filename))
+    try! data.write(to: URL(fileURLWithPath: filename))
     print("Generated \(name).png (\(size)x\(size))")
 }
 print("Done!")
