@@ -1,9 +1,0 @@
-body.theme-dark, body:not(.theme-light) {
-  background: #0A0A0F;
-  color: #E4E4E7;
-}
-body.theme-dark #editor code { background: #1E1E2E; color: #E4E4E7; }
-body.theme-dark #editor pre { background: #1E1E2E; }
-body.theme-dark #editor th, body.theme-dark #editor td { border-color: #2A2A3A; }
-body.theme-dark #editor hr { background: #2A2A3A; }
-body.theme-dark .code-view { background: #1E1E2E; color: #E4E4E7; }
