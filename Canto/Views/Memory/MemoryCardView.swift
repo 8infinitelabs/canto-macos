@@ -3,6 +3,7 @@ import SwiftUI
 struct MemoryCardView: View {
     @Environment(AppState.self) private var appState
     let memory: MemoryFile
+    @State private var showDeleteConfirm = false
 
     var body: some View {
         Button {
@@ -67,5 +68,21 @@ struct MemoryCardView: View {
             .cornerRadius(10)
         }
         .buttonStyle(.plain)
+        .contextMenu {
+            Button(role: .destructive) {
+                showDeleteConfirm = true
+            } label: {
+                Label("Delete Memory", systemImage: "trash")
+            }
+        }
+        .alert("Delete \"\(memory.name)\"?", isPresented: $showDeleteConfirm) {
+            Button("Delete", role: .destructive) {
+                try? FileManager.default.removeItem(at: memory.url)
+                appState.reloadMemories()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This memory file will be moved to Trash.")
+        }
     }
 }

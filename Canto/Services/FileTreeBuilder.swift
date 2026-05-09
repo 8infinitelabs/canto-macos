@@ -59,6 +59,16 @@ enum FileTreeBuilder {
                 }
                 continue
             }
+
+            let isDir = (try? stdURL.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory ?? false
+            // Only collect directories and markdown/CLAUDE.md — skip everything else
+            if !isDir {
+                let name = stdURL.lastPathComponent
+                let ext = stdURL.pathExtension.lowercased()
+                if ext != "md" && name != "CLAUDE.md" {
+                    continue
+                }
+            }
             allURLs.append(stdURL)
         }
 

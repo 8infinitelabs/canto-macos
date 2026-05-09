@@ -47,6 +47,38 @@ struct FileTreeSection: View {
     }
 }
 
+/// File tree with "New File" button.
+struct FileTreeWithToolbar: View {
+    @Environment(AppState.self) private var appState
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text("FILES")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(CantoColors.textSecondary)
+
+                Spacer()
+
+                Button {
+                    appState.createNewFile()
+                } label: {
+                    Image(systemName: "doc.badge.plus")
+                        .font(.system(size: 13))
+                        .foregroundStyle(CantoColors.textSecondary)
+                }
+                .buttonStyle(.plain)
+                .help("New markdown file (⌘N)")
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 4)
+            .background(CantoColors.surface.opacity(0.4))
+
+            FileTreeSection()
+        }
+    }
+}
+
 /// Top-level folder with expandable contents.
 struct FolderRow: View {
     @Environment(AppState.self) private var appState

@@ -2,8 +2,15 @@ import SwiftUI
 
 struct EditorContainerView: View {
     @Environment(AppState.self) private var appState
-    @State private var wordCount = 0
-    @State private var readingTime = 1
+
+    private var wordCount: Int {
+        guard let content = appState.activeTab?.content else { return 0 }
+        return content.split(separator: " ").count
+    }
+
+    private var readingTime: Int {
+        max(1, wordCount / 200)
+    }
 
     var body: some View {
         VStack(spacing: 0) {

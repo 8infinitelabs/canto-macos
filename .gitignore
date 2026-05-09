@@ -5,3 +5,10 @@ DerivedData/
 node_modules/
 editor-web/dist/
 .swiftpm/
+
+# Build artifacts
+*.profraw
+canto-vscode/
+
+# Screenshot raw captures (intermediate)
+AppStore/screenshots/raw/

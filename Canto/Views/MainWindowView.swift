@@ -1,4 +1,21 @@
 import SwiftUI
+import AppKit
+
+/// Hidden helper to disable native window tabbing on the host NSWindow.
+/// Prevents duplicate empty Canto windows from merging into a tab bar.
+private struct WindowConfigurator: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        let v = NSView()
+        DispatchQueue.main.async {
+            if let window = v.window {
+                window.tabbingMode = .disallowed
+                window.titlebarAppearsTransparent = false
+            }
+        }
+        return v
+    }
+    func updateNSView(_ nsView: NSView, context: Context) {}
+}
 
 struct MainWindowView: View {
     @Environment(AppState.self) private var appState
@@ -10,7 +27,6 @@ struct MainWindowView: View {
             Group {
                 if appState.hasOpenFolder {
                     if isFocusMode {
-                        // Focus mode: just the editor, centered
                         VStack(spacing: 0) {
                             if let tab = appState.activeTab {
                                 MarkdownWebView(
@@ -40,7 +56,6 @@ struct MainWindowView: View {
                 }
             }
 
-            // Command palette overlay
             if showCommandPalette {
                 Color.black.opacity(0.3)
                     .ignoresSafeArea()
@@ -54,10 +69,16 @@ struct MainWindowView: View {
             }
         }
         .preferredColorScheme(appState.settings.theme == "dark" ? .dark : .light)
-        .onOpenURL { url in
-            if url.hasDirectoryPath {
-                appState.openFolder(url)
-            }
+        .navigationTitle(appState.openFolderURL?.lastPathComponent ?? "Canto")
+        .navigationSubtitle(appState.activeTab?.name ?? "")
+        .background(WindowConfigurator())
+        .onReceive(NotificationCenter.default.publisher(for: .cantoNewFile)) { _ in
+            guard appState.hasOpenFolder else { return }
+            appState.createNewFile()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .cantoCloseTab)) { _ in
+            guard let id = appState.activeTabID else { return }
+            appState.closeTab(id)
         }
     }
 }

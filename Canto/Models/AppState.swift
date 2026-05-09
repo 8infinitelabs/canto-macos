@@ -10,6 +10,7 @@ enum ActiveView: Equatable {
 }
 
 @Observable
+@MainActor
 class AppState {
     // Folder state
     var openFolderURL: URL?
@@ -31,6 +32,7 @@ class AppState {
     var sessionManager: SessionManager?
     private var gitPollTimer: Timer?
     private var lastKnownCommitHash: String?
+    private var fileTreeRebuildTask: Task<Void, Never>?
 
     // Claude-specific state
     var memories: [MemoryFile] = []
@@ -49,23 +51,11 @@ class AppState {
 
     func openFolder(_ url: URL) {
         closeFolderIfNeeded()
-        print("[Canto] openFolder: \(url.path)")
-
         _ = FolderAccessService.startAccessing(url: url)
+
+        // Show the project UI immediately — heavy work runs in background
         openFolderURL = url
-
-        fileTree = FileTreeBuilder.build(from: url, mode: .markdownOnly)
-        print("[Canto] fileTree: \(fileTree.count) items")
-
-        isClaudeProject = FileManager.default.fileExists(
-            atPath: url.appendingPathComponent(".claude").path
-        )
-        print("[Canto] isClaudeProject: \(isClaudeProject)")
-
-        if isClaudeProject {
-            loadClaudeData(projectURL: url)
-            print("[Canto] claudeMD sections: \(claudeMDSections.count), memories: \(memories.count)")
-        }
+        recentFolders.addFolder(url: url)
 
         fileWatcher.onChange = { [weak self] path, flags in
             self?.handleFileChange(path: path, flags: flags)
@@ -78,13 +68,56 @@ class AppState {
             groupingWindow: TimeInterval(settings.sessionGroupingWindow)
         )
 
-        recentFolders.addFolder(url: url)
+        // Scan file tree + Claude data on a background thread
+        Task.detached(priority: .userInitiated) { [weak self] in
+            let tree = FileTreeBuilder.build(from: url, mode: .markdownOnly)
+            let isClaude = FileManager.default.fileExists(
+                atPath: url.appendingPathComponent(".claude").path
+            )
+            // Load all Claude data off the main actor
+            var sections: [ClaudeMDSection] = []
+            var memories: [MemoryFile] = []
+            var servers: [MCPServerConfig] = []
+            var perms: [PermissionConfig] = []
+            var hooks: [HookConfig] = []
+            if isClaude {
+                let claudeMDPath = url.appendingPathComponent("CLAUDE.md")
+                if let content = try? String(contentsOf: claudeMDPath, encoding: .utf8) {
+                    sections = ClaudeMDParser.parse(content)
+                }
+                memories = Self.loadMemoriesSync(from: url.appendingPathComponent(".claude/memory"))
+                let projectSettings = url.appendingPathComponent(".claude/settings.json")
+                let globalSettings = FileManager.default.homeDirectoryForCurrentUser
+                    .appendingPathComponent(".claude/settings.json")
+                let config = ConfigReader.readClaudeSettings(
+                    globalPath: globalSettings,
+                    projectPath: projectSettings
+                )
+                servers = config.servers
+                perms = config.permissions
+                hooks = config.hooks
+            }
+            await MainActor.run { [weak self] in
+                guard let self, self.openFolderURL == url else { return }
+                self.fileTree = tree
+                self.isClaudeProject = isClaude
+                self.claudeMDSections = sections
+                self.memories = memories
+                self.mcpServers = servers
+                self.permissions = perms
+                self.hooks = hooks
+            }
+        }
 
-        // Start git polling if git repo
-        if GitService.isGitRepo(at: url) {
+        // Git check in background
+        Task.detached(priority: .background) { [weak self] in
+            guard GitService.isGitRepo(at: url) else { return }
             let commits = GitService.recentCommits(at: url, limit: 1)
-            lastKnownCommitHash = commits.first?.hash
-            startGitPolling(url: url)
+            await MainActor.run { [weak self] in
+                guard let self, self.openFolderURL == url else { return }
+                self.lastKnownCommitHash = commits.first?.hash
+                self.startGitPolling(url: url)
+            }
         }
     }
 
@@ -170,6 +203,26 @@ class AppState {
         hooks = config.hooks
     }
 
+    func createNewFile(name: String = "untitled", in directory: URL? = nil) {
+        guard let rootURL = openFolderURL else { return }
+        let targetDir = directory ?? rootURL
+        do {
+            let fileURL = try MarkdownFileService.createNew(in: targetDir, name: name)
+            fileTree = FileTreeBuilder.build(from: rootURL, mode: .markdownOnly)
+            let node = FileNode(
+                id: fileURL.lastPathComponent,
+                name: fileURL.lastPathComponent,
+                url: fileURL,
+                isDirectory: false,
+                children: nil,
+                fileExtension: "md"
+            )
+            openFile(node)
+        } catch {
+            print("[Canto] Failed to create file: \(error)")
+        }
+    }
+
     func reloadMemories() {
         guard let folderURL = openFolderURL else { return }
         loadMemories(from: folderURL.appendingPathComponent(".claude/memory"))
@@ -181,12 +234,16 @@ class AppState {
     }
 
     private func loadMemories(from directory: URL) {
+        memories = Self.loadMemoriesSync(from: directory)
+    }
+
+    private nonisolated static func loadMemoriesSync(from directory: URL) -> [MemoryFile] {
         let fm = FileManager.default
         guard let files = try? fm.contentsOfDirectory(at: directory, includingPropertiesForKeys: [.contentModificationDateKey])
             .filter({ $0.pathExtension == "md" })
-        else { return }
+        else { return [] }
 
-        memories = files.compactMap { url in
+        return files.compactMap { url in
             guard let content = try? String(contentsOf: url, encoding: .utf8),
                   let attrs = try? url.resourceValues(forKeys: [.contentModificationDateKey]),
                   let modDate = attrs.contentModificationDate
@@ -223,7 +280,13 @@ class AppState {
     private func handleFileChange(path: String, flags: FSEventStreamEventFlags) {
         guard let folderURL = openFolderURL else { return }
 
-        fileTree = FileTreeBuilder.build(from: folderURL, mode: .markdownOnly)
+        // Debounce file tree rebuild — coalesce rapid FS events into one rebuild
+        fileTreeRebuildTask?.cancel()
+        fileTreeRebuildTask = Task {
+            try? await Task.sleep(for: .milliseconds(500))
+            guard !Task.isCancelled, self.openFolderURL == folderURL else { return }
+            self.fileTree = FileTreeBuilder.build(from: folderURL, mode: .markdownOnly)
+        }
 
         let relativePath = path.replacingOccurrences(of: folderURL.path + "/", with: "")
         let url = URL(fileURLWithPath: path)

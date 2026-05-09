@@ -1,15 +1,26 @@
 import SwiftUI
 
 /// Block-level markdown renderer using native SwiftUI.
-/// Parses markdown into blocks and renders them as proper typography.
+/// Parses markdown into blocks and renders them with proper typography.
+/// Parsing is cached — only recomputes when content changes.
 struct MarkdownRenderer: View {
     let content: String
+    @State private var blocks: [MarkdownBlock] = []
+
+    init(content: String) {
+        self.content = content
+        _blocks = State(initialValue: parseBlocks(content))
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ForEach(Array(parseBlocks(content).enumerated()), id: \.offset) { _, block in
+        LazyVStack(alignment: .leading, spacing: 8) {
+            ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
                 blockView(block)
             }
+        }
+        .drawingGroup()
+        .onChange(of: content) { _, newContent in
+            blocks = parseBlocks(newContent)
         }
     }
 
@@ -84,6 +95,54 @@ struct MarkdownRenderer: View {
                     .textSelection(.enabled)
             }
 
+        case .table(let headers, let rows):
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(spacing: 0) {
+                    ForEach(Array(headers.enumerated()), id: \.offset) { index, header in
+                        Text(inlineMarkdown(header))
+                            .font(CantoTypography.bodySmall)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(CantoColors.textPrimary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 6)
+                            .textSelection(.enabled)
+                        if index < headers.count - 1 {
+                            Divider()
+                        }
+                    }
+                }
+                .background(CantoColors.surface)
+
+                Divider()
+
+                ForEach(Array(rows.enumerated()), id: \.offset) { rowIndex, row in
+                    HStack(spacing: 0) {
+                        ForEach(Array(row.enumerated()), id: \.offset) { colIndex, cell in
+                            Text(inlineMarkdown(cell))
+                                .font(CantoTypography.bodySmall)
+                                .foregroundStyle(CantoColors.textPrimary.opacity(0.9))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 5)
+                                .textSelection(.enabled)
+                            if colIndex < row.count - 1 {
+                                Divider()
+                            }
+                        }
+                    }
+                    .background(rowIndex % 2 == 1 ? CantoColors.surface.opacity(0.5) : Color.clear)
+                    if rowIndex < rows.count - 1 {
+                        Divider()
+                    }
+                }
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(CantoColors.textSecondary.opacity(0.25), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+
         case .divider:
             Divider()
                 .padding(.vertical, 4)
@@ -121,6 +180,7 @@ enum MarkdownBlock {
     case numberedList([String])
     case codeBlock(code: String, language: String?)
     case quote(String)
+    case table(headers: [String], rows: [[String]])
     case divider
     case empty
 }
@@ -128,121 +188,171 @@ enum MarkdownBlock {
 // MARK: - Parser
 
 func parseBlocks(_ markdown: String) -> [MarkdownBlock] {
+    let lines = markdown.split(separator: "\n", omittingEmptySubsequences: false)
     var blocks: [MarkdownBlock] = []
-    var lines = markdown.components(separatedBy: .newlines)
+    blocks.reserveCapacity(lines.count / 2)
     var i = 0
 
     while i < lines.count {
-        let line = lines[i]
-        let trimmed = line.trimmingCharacters(in: .whitespaces)
+        let rawLine = lines[i]
+        let trimmed = rawLine.trimmingCharacters(in: .whitespaces)
+        i += 1
 
-        // Empty line — skip (block separator)
-        if trimmed.isEmpty {
-            i += 1
-            continue
-        }
+        if trimmed.isEmpty { continue }
 
-        // Heading
-        if let match = trimmed.range(of: #"^(#{1,6})\s+(.+)$"#, options: .regularExpression) {
+        // Use first character dispatch for fast classification
+        switch trimmed.first {
+        case "#" where trimmed.hasPrefix("#"):
             let hashes = trimmed.prefix(while: { $0 == "#" })
-            let level = hashes.count
-            let text = String(trimmed[match].dropFirst(level).trimmingCharacters(in: .whitespaces))
-            blocks.append(.heading(level: level, text: text))
-            i += 1
-            continue
-        }
+            let count = hashes.count
+            if count <= 6 {
+                let start = trimmed.index(trimmed.startIndex, offsetBy: count)
+                let rest = trimmed[start...].trimmingCharacters(in: .whitespaces)
+                if !rest.isEmpty {
+                    blocks.append(.heading(level: count, text: String(rest)))
+                    continue
+                }
+            }
 
-        // Divider
-        if trimmed == "---" || trimmed == "***" || trimmed == "___" {
+        case "-" where trimmed == "---":
             blocks.append(.divider)
-            i += 1
             continue
-        }
 
-        // Code block (fenced)
-        if trimmed.hasPrefix("```") {
+        case ">":
+            var quoteLines: [String] = []
+            var j = i - 1
+            while j < lines.count {
+                let l = lines[j].trimmingCharacters(in: .whitespaces)
+                if l.hasPrefix("> ") {
+                    quoteLines.append(String(l.dropFirst(2)))
+                    j += 1
+                } else { break }
+            }
+            blocks.append(.quote(quoteLines.joined(separator: " ")))
+            i = j
+            continue
+
+        case "-", "*":
+            let rest = trimmed.dropFirst()
+            if rest.hasPrefix(" ") {
+                var items: [String] = []
+                var j = i - 1
+                while j < lines.count {
+                    let l = lines[j].trimmingCharacters(in: .whitespaces)
+                    if l.hasPrefix("- ") || l.hasPrefix("* ") {
+                        items.append(String(l.dropFirst(2)))
+                        j += 1
+                    } else { break }
+                }
+                blocks.append(.bulletList(items))
+                i = j
+                continue
+            }
+
+        case "`" where trimmed.hasPrefix("```"):
             let language = String(trimmed.dropFirst(3)).trimmingCharacters(in: .whitespaces)
             var codeLines: [String] = []
-            i += 1
             while i < lines.count {
-                let l = lines[i].trimmingCharacters(in: .whitespaces)
-                if l.hasPrefix("```") {
+                if lines[i].trimmingCharacters(in: .whitespaces).hasPrefix("```") {
                     i += 1
                     break
                 }
-                codeLines.append(lines[i])
+                codeLines.append(String(lines[i]))
                 i += 1
             }
             blocks.append(.codeBlock(code: codeLines.joined(separator: "\n"), language: language.isEmpty ? nil : language))
             continue
-        }
 
-        // Quote
-        if trimmed.hasPrefix("> ") {
-            var quoteLines: [String] = []
-            while i < lines.count {
-                let l = lines[i].trimmingCharacters(in: .whitespaces)
-                if l.hasPrefix("> ") {
-                    quoteLines.append(String(l.dropFirst(2)))
-                    i += 1
-                } else {
-                    break
-                }
+        case "|":
+            var tableLines: [String] = []
+            var j = i - 1
+            while j < lines.count {
+                let l = lines[j].trimmingCharacters(in: .whitespaces)
+                if l.hasPrefix("|") {
+                    tableLines.append(l)
+                    j += 1
+                } else { break }
             }
-            blocks.append(.quote(quoteLines.joined(separator: " ")))
-            continue
-        }
-
-        // Bullet list
-        if trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ") {
-            var items: [String] = []
-            while i < lines.count {
-                let l = lines[i].trimmingCharacters(in: .whitespaces)
-                if l.hasPrefix("- ") || l.hasPrefix("* ") {
-                    items.append(String(l.dropFirst(2)))
-                    i += 1
-                } else {
-                    break
-                }
+            i = j
+            if tableLines.count >= 2 {
+                let headers = parseTableRow(tableLines[0])
+                let dataRows = tableLines.dropFirst(2).map { parseTableRow($0) }
+                blocks.append(.table(headers: headers, rows: Array(dataRows)))
+            } else if !tableLines.isEmpty {
+                blocks.append(.paragraph(tableLines.joined(separator: " ")))
             }
-            blocks.append(.bulletList(items))
             continue
-        }
 
-        // Numbered list
-        if trimmed.range(of: #"^\d+\.\s"#, options: .regularExpression) != nil {
-            var items: [String] = []
-            while i < lines.count {
-                let l = lines[i].trimmingCharacters(in: .whitespaces)
-                if let match = l.range(of: #"^\d+\.\s"#, options: .regularExpression) {
-                    items.append(String(l[match.upperBound...]))
-                    i += 1
-                } else {
-                    break
+        default:
+            if let first = trimmed.first, first.isNumber, isNumberedLine(trimmed) {
+                var items: [String] = []
+                var j = i - 1
+                while j < lines.count {
+                    let l = lines[j].trimmingCharacters(in: .whitespaces)
+                    if isNumberedLine(l) {
+                        let dotIdx = l.firstIndex(of: ".")!
+                        items.append(String(l[l.index(after: dotIdx)...]).trimmingCharacters(in: .whitespaces))
+                        j += 1
+                    } else { break }
                 }
+                blocks.append(.numberedList(items))
+                i = j
+                continue
             }
-            blocks.append(.numberedList(items))
-            continue
+            break
         }
 
-        // Paragraph — collect consecutive non-empty lines
-        var paragraphLines: [String] = []
-        while i < lines.count {
-            let l = lines[i].trimmingCharacters(in: .whitespaces)
+        // Paragraph fallthrough — collect consecutive non-empty lines
+        var paraLines: [String] = []
+        var j = i - 1
+        while j < lines.count {
+            let l = lines[j].trimmingCharacters(in: .whitespaces)
             if l.isEmpty { break }
-            // Stop if we hit a block starter
-            if l.hasPrefix("#") || l.hasPrefix("- ") || l.hasPrefix("* ") ||
-               l.hasPrefix("> ") || l.hasPrefix("```") || l == "---" ||
-               l.range(of: #"^\d+\.\s"#, options: .regularExpression) != nil {
-                break
-            }
-            paragraphLines.append(lines[i])
-            i += 1
+            if isBlockStarter(l) { break }
+            paraLines.append(String(lines[j]))
+            j += 1
         }
-        if !paragraphLines.isEmpty {
-            blocks.append(.paragraph(paragraphLines.joined(separator: " ")))
+        i = j
+        if !paraLines.isEmpty {
+            blocks.append(.paragraph(paraLines.joined(separator: " ")))
         }
     }
 
     return blocks
+}
+
+private func isNumberedLine(_ s: String) -> Bool {
+    guard let first = s.first, first.isNumber else { return false }
+    // Find the dot-space pattern: "1. " or "12. "
+    var digits = 0
+    for ch in s {
+        if ch.isNumber { digits += 1; continue }
+        if ch == "." && digits > 0 {
+            let after = s[s.index(s.startIndex, offsetBy: digits + 1)...]
+            return after.hasPrefix(" ")
+        }
+        return false
+    }
+    return false
+}
+
+private func isBlockStarter(_ s: String) -> Bool {
+    guard let first = s.first else { return false }
+    switch first {
+    case "#": return s.hasPrefix("#")
+    case "-": return s.hasPrefix("- ") || s == "---"
+    case "*": return s.hasPrefix("* ") || s == "***"
+    case ">": return s.hasPrefix("> ")
+    case "`": return s.hasPrefix("```")
+    case "|": return true
+    case "0"..."9": return isNumberedLine(s)
+    default: return false
+    }
+}
+
+private func parseTableRow(_ line: String) -> [String] {
+    var s = line.trimmingCharacters(in: .whitespaces)
+    if s.hasPrefix("|") { s = String(s.dropFirst()) }
+    if s.hasSuffix("|") { s = String(s.dropLast()) }
+    return s.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }
 }

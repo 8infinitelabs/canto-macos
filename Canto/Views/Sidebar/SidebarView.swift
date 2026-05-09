@@ -21,7 +21,7 @@ struct SidebarView: View {
                     ClaudeSidebarSection()
                 }
 
-                FileTreeSection()
+                FileTreeWithToolbar()
             }
             .listStyle(.sidebar)
         }

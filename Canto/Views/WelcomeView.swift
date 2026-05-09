@@ -2,16 +2,6 @@ import SwiftUI
 
 struct WelcomeView: View {
     @Environment(AppState.self) private var appState
-    @Environment(\.openWindow) private var openWindow
-
-    private func openProject(url: URL) {
-        // If this window is empty (welcome), load here; otherwise open new window
-        if appState.hasOpenFolder {
-            openWindow(id: "project", value: url)
-        } else {
-            appState.openFolder(url)
-        }
-    }
 
     var body: some View {
         VStack(spacing: 32) {
@@ -22,14 +12,14 @@ struct WelcomeView: View {
                     .frame(width: 80, height: 80)
 
                 Text("Canto")
-                    .font(CantoTypography.displayLarge)
+                    .font(.system(size: 32, weight: .bold))
                     .foregroundStyle(CantoColors.textPrimary)
 
-                Text("Claude's markdown companion.")
+                Text("Your Claude Code companion for Mac")
                     .font(CantoTypography.body)
                     .foregroundStyle(CantoColors.textSecondary)
 
-                Text("One window per project. Edit CLAUDE.md, memories, plans, and outputs visually.")
+                Text("Edit CLAUDE.md, manage memories, browse plans,\nand track coding sessions — all in a native Mac app.")
                     .font(CantoTypography.bodySmall)
                     .foregroundStyle(CantoColors.textSecondary.opacity(0.7))
                     .multilineTextAlignment(.center)
@@ -37,38 +27,39 @@ struct WelcomeView: View {
                     .padding(.top, 4)
             }
 
-            VStack(spacing: 16) {
+            VStack(spacing: 12) {
+                Button {
+                    if let url = FolderAccessService.openFolderPanel() {
+                        appState.openFolder(url)
+                    }
+                } label: {
+                    Label("Open Project...", systemImage: "folder")
+                        .frame(width: 200)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(CantoColors.accent)
+                .controlSize(.large)
+                .keyboardShortcut("o", modifiers: .command)
+                .accessibilityHint("Choose a Claude Code project folder")
+
+                // Drop zone
                 RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(CantoColors.textSecondary.opacity(0.3), style: StrokeStyle(lineWidth: 2, dash: [8]))
-                    .frame(height: 120)
+                    .strokeBorder(CantoColors.textSecondary.opacity(0.25), style: StrokeStyle(lineWidth: 2, dash: [6]))
+                    .frame(width: 320, height: 80)
                     .overlay(
-                        VStack(spacing: 8) {
-                            Image(systemName: "folder.badge.plus")
-                                .font(.system(size: 28))
+                        HStack(spacing: 6) {
+                            Image(systemName: "arrow.down.doc")
+                                .font(.system(size: 18))
                                 .foregroundStyle(CantoColors.textSecondary)
                             Text("Drop a project folder here")
-                                .font(CantoTypography.body)
+                                .font(CantoTypography.bodySmall)
                                 .foregroundStyle(CantoColors.textSecondary)
-                            Text("Works best with a .claude/ directory")
-                                .font(CantoTypography.uiSmall)
-                                .foregroundStyle(CantoColors.textSecondary.opacity(0.6))
                         }
                     )
                     .onDrop(of: [.fileURL], isTargeted: nil) { providers in
                         handleDrop(providers)
                     }
-
-                Button("Open Project") {
-                    if let url = FolderAccessService.openFolderPanel() {
-                        openProject(url: url)
-                    }
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(CantoColors.accent)
-                .controlSize(.large)
-                .accessibilityHint("Choose a project folder to open")
             }
-            .frame(maxWidth: 400)
 
             if !appState.recentFolders.folders.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
@@ -79,7 +70,7 @@ struct WelcomeView: View {
                     ForEach(appState.recentFolders.folders.prefix(5)) { folder in
                         Button {
                             if let url = appState.recentFolders.resolveBookmark(folder) {
-                                openProject(url: url)
+                                appState.openFolder(url)
                             }
                         } label: {
                             HStack {
@@ -89,16 +80,9 @@ struct WelcomeView: View {
                                     Text(folder.path.components(separatedBy: "/").suffix(2).joined(separator: "/"))
                                         .font(CantoTypography.sidebar)
                                         .foregroundStyle(CantoColors.textPrimary)
-                                    HStack(spacing: 8) {
-                                        if folder.hasClaude {
-                                            Text("\(folder.memoryCount) memories")
-                                                .font(CantoTypography.uiSmall)
-                                                .foregroundStyle(CantoColors.accent)
-                                        }
-                                        Text(folder.lastOpened, style: .relative)
-                                            .font(CantoTypography.uiSmall)
-                                            .foregroundStyle(CantoColors.textSecondary)
-                                    }
+                                    Text(folder.lastOpened, style: .relative)
+                                        .font(CantoTypography.uiSmall)
+                                        .foregroundStyle(CantoColors.textSecondary)
                                 }
                                 Spacer()
                             }
@@ -110,10 +94,14 @@ struct WelcomeView: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .frame(maxWidth: 400)
+                .frame(width: 320)
             }
 
             Spacer()
+
+            Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")")
+                .font(CantoTypography.uiSmall)
+                .foregroundStyle(CantoColors.textSecondary.opacity(0.4))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(CantoColors.background)
@@ -127,7 +115,7 @@ struct WelcomeView: View {
                   url.hasDirectoryPath
             else { return }
             DispatchQueue.main.async {
-                openProject(url: url)
+                appState.openFolder(url)
             }
         }
         return true
